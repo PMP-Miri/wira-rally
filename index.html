@@ -1,18 +1,95 @@
 <!doctype html>
 <html lang="ms">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#11182b"><meta name="description" content="Cabutan bertuah perlumbaan kartun 3D. Scan, sertai dan saksikan siapa juara.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11182b">
+  <meta name="description" content="Cabutan bertuah perlumbaan kartun 3D. Scan, sertai dan saksikan siapa juara.">
   <title>Wira Rally | Lucky Draw 3D</title>
-  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
-  <script src="config.js"></script><script src="shared/core.js"></script>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css?v=flat-fix-1">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
+  <style>
+    body { margin:0; background:#101423; color:#edf2ff; font-family:system-ui,sans-serif; }
+    .boot { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; padding:28px; text-align:center; }
+    .boot .logo-mark { display:inline-grid; place-items:center; width:68px; height:68px; border-radius:22px; background:#bcf568; color:#172034; font-size:44px; font-weight:900; }
+    .boot h1 { font-size:clamp(30px,5vw,52px); margin:32px 0; }
+    .boot p { color:#a9b6ce; line-height:1.6; max-width:640px; }
+    .boot pre { max-width:680px; width:100%; white-space:pre-wrap; overflow-wrap:anywhere; background:#1e2538; border:1px solid #46516b; border-radius:16px; padding:18px; box-sizing:border-box; text-align:left; color:#ffc8c8; }
+    .boot button { padding:14px 22px; border:0; border-radius:12px; background:#bcf568; color:#172034; font:700 16px system-ui,sans-serif; cursor:pointer; }
+  </style>
 </head>
 <body>
   <div id="app"><div class="boot"><span class="logo-mark">W</span><h1>WIRA RALLY</h1><p>Memanaskan litar…</p></div></div>
   <div id="toasts" role="status" aria-live="polite"></div>
   <div id="dialog-root"></div>
-  <script type="module" src="src/app.js"></script>
+  <noscript><p style="padding:24px">JavaScript perlu diaktifkan untuk membuka Wira Rally.</p></noscript>
+  <script type="module">
+    const root = document.getElementById('app');
+    let started = false;
+    let failed = false;
+    function showBootError(error) {
+      if (started || failed) return;
+      failed = true;
+      clearTimeout(watchdog);
+      const box = document.createElement('div');
+      box.className = 'boot';
+      const title = document.createElement('h1');
+      title.textContent = 'Litar belum dapat dibuka';
+      const hint = document.createElement('p');
+      hint.textContent = 'Pastikan index.html, config.js, core.js, app.js, api.js, effects.js, scene.js, styles.css dan icon.svg berada pada aras folder yang sama. Tunggu GitHub Pages selesai deploy, kemudian cuba semula.';
+      const detail = document.createElement('pre');
+      detail.textContent = error instanceof Error ? error.message : String(error || 'Ralat permulaan tidak diketahui.');
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'Cuba semula';
+      retry.addEventListener('click', () => location.reload());
+      box.append(title, hint, detail, retry);
+      root.replaceChildren(box);
+    }
+    const watchdog = setTimeout(() => showBootError(new Error('Permulaan melebihi 25 saat. Semak sambungan dan fail JavaScript dalam Console.')), 25000);
+    const onError = event => {
+      if (event.error || event.message) showBootError(event.error || event.message);
+    };
+    const onRejection = event => showBootError(event.reason);
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onRejection);
+    function loadScript(path) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        const timer = setTimeout(() => {
+          script.remove();
+          reject(new Error('Masa memuatkan ' + path + ' tamat. Semak sambungan Internet.'));
+        }, 12000);
+        script.src = new URL(path, location.href).href;
+        script.onload = () => { clearTimeout(timer); resolve(); };
+        script.onerror = () => {
+          clearTimeout(timer);
+          script.remove();
+          reject(new Error('Gagal memuatkan ' + path + '. Pastikan fail ini sudah dimuat naik pada aras yang sama dengan index.html.'));
+        };
+        document.head.append(script);
+      });
+    }
+    try {
+      await loadScript('./config.js?v=flat-fix-1');
+      if (!window.WIRA_CONFIG || typeof window.WIRA_CONFIG !== 'object') throw new Error('config.js tidak menetapkan window.WIRA_CONFIG. Kekalkan format config.js asal.');
+      if (failed) throw new Error('Permulaan telah dihentikan. Tekan Cuba semula.');
+      await loadScript('./core.js?v=flat-fix-1');
+      if (!window.WiraCore) throw new Error('core.js tidak menetapkan window.WiraCore. Muat naik core.js daripada pakej pembetulan.');
+      if (failed) throw new Error('Permulaan telah dihentikan. Tekan Cuba semula.');
+      await import('./app.js?v=flat-fix-1');
+      if (!failed) {
+        started = true;
+        clearTimeout(watchdog);
+      }
+    } catch (error) {
+      console.error('Wira Rally: gagal bermula', error);
+      showBootError(error);
+    } finally {
+      window.removeEventListener('error', onError);
+      window.removeEventListener('unhandledrejection', onRejection);
+    }
+  </script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+PEMBETULAN WIRA RALLY: LOADING / 404
+
+Pakej ini untuk fail frontend pada ROOT repository (tiada folder src/shared/assets diperlukan).
+
+1. Sebelum menggantikan fail, simpan salinan repository: Code > Download ZIP.
+2. Buka tab Code repository PMP-Miri/wira-rally, bukan Settings > Pages.
+3. Ekstrak ZIP pembetulan ini di komputer.
+4. Klik Add file > Upload files. Pilih 8 fail berikut dan upload ke ROOT:
+   index.html, app.js, api.js, effects.js, scene.js, core.js, styles.css, icon.svg.
+   Jangan upload folder pembungkus wira-rally-fix sebagai folder baharu.
+5. Commit changes. Tunggu deployment GitHub Pages selesai.
+6. Buka semula https://pmp-miri.github.io/wira-rally/
+   Mac Chrome: Command + Shift + R. Windows Chrome: Ctrl + Shift + R.
+7. Uji halaman utama dahulu, kemudian Cuba demo. Selepas itu uji urusetia dengan backend sebenar.
+
+KEKALKAN config.js sedia ada. Pakej ini TIDAK mengandungi config.js dan TIDAK mengandungi fail backend.
+Tidak perlu Run setup semula atau deploy Apps Script semula untuk pembetulan frontend ini.
+Jangan padam folder/fail lama dahulu. Patch ini tidak memerlukannya, tetapi menyimpannya memudahkan rollback.
+
+Apa berubah:
+- Rujukan shared/core.js menjadi ./core.js.
+- Rujukan src/app.js menjadi ./app.js.
+- Ikon merujuk ./icon.svg.
+- Loader menyemak kewujudan config dan core, dengan had masa.
+- Ralat permulaan dipaparkan pada halaman, bukan loading tanpa penghujung.
+- Kod perlumbaan asal dikekalkan; tiada perubahan cabutan, PIN atau data sesi.
+
+Semakan yang dilakukan: semua rujukan fail tempatan frontend diperiksa; fail JavaScript permainan sepadan dengan pakej asal; ZIP tidak mengandungi config atau backend.
+Belum diuji: pelayar sebenar, deployment GitHub pengguna, sambungan Apps Script sebenar.
+Rollback: upload semula 8 fail versi lama daripada sandaran GitHub ZIP; config.js/backend tidak terlibat.
